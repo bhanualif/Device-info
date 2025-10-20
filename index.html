@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tugas — Input Device Info</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Input Device Info</h1>
+
+  <form id="deviceForm">
+    <label for="deviceId">Device ID</label>
+    <input id="deviceId" placeholder="Contoh: SBX-0001" required>
+
+    <label for="deviceName">Device Name</label>
+    <select id="deviceName" required>
+      <option value="">-- Pilih Device --</option>
+      <option value="sound box pocket">sound box pocket</option>
+      <option value="sound box premium">sound box premium</option>
+    </select>
+
+    <button type="submit">Add Device</button>
+  </form>
+
+  <table id="deviceTable">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Device ID</th>
+        <th>Device Name</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    // ===== Jawaban Anda =====
+    const devices = [];
+
+    function addDevice(deviceId, deviceName) {
+      // TODO: Lengkapi agar menyimpan data deviceId & deviceName ke array devices
+      const validNames = ["sound box pocket", "sound box premium"];
+
+      if (!validNames.includes(deviceName)) return false;
+
+      const exists = devices.some(d => d.deviceId === deviceId);
+      if (exists) return false;
+
+      devices.push({ deviceId, deviceName });
+      return true;
+    }
+
+    const form = document.getElementById("deviceForm");
+    const tableBody = document.querySelector("#deviceTable tbody");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const deviceId = document.getElementById("deviceId").value.trim();
+      const deviceName = document.getElementById("deviceName").value;
+
+      const added = addDevice(deviceId, deviceName);
+      if (!added) {
+        alert("❌ Gagal menambah device! (ID duplikat atau nama tidak valid)");
+        return;
+      }
+
+      renderTable();
+      form.reset();
+    });
+
+    function renderTable() {
+      tableBody.innerHTML = "";
+      devices.forEach((d, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${d.deviceId}</td>
+          <td>${d.deviceName}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
