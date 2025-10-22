@@ -74,4 +74,44 @@ function addDevice(deviceId, deviceName) {
   return true;
 }
 
+
 🚀 Cara Menjalankan
+# Device App (Frontend + API)
+
+Aplikasi sederhana untuk input & menampilkan daftar device menggunakan HTML, CSS, JS, dan Express.js API.
+
+## 🚀 Fitur
+- Tambah device dengan validasi (unik & nama valid)
+- Data disimpan di backend API
+- Tabel otomatis update dari server
+
+## 📁 Struktur
+device-app/
+├─ backend/
+│ └─ server.js
+├─ frontend/
+│ └─ index.html
+└─ package.json
+
+markdown
+Copy code
+
+## 🧰 Instalasi & Jalankan
+
+1. Install dependencies
+   ```bash
+   npm install
+Jalankan server backend
+
+bash
+Copy code
+node backend/server.js
+Akses di: http://localhost:3000/devices
+
+Jalankan frontend
+
+bash
+Copy code
+npx serve frontend
+Akses di: http://localhost:5500
+
