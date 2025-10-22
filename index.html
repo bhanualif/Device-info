@@ -2,137 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Tugas — Input Device Info</title>
+  <title>Input Device Info (dengan API)</title>
   <style>
-  /* ====== Global Styles ====== */
-  body {
-    font-family: "Poppins", Arial, sans-serif;
-    background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
-    min-height: 100vh;
-    padding: 40px 20px;
-    color: #333;
-  }
-
-  h1 {
-    text-align: center;
-    color: #0d47a1;
-    letter-spacing: 1px;
-    margin-bottom: 30px;
-  }
-
-  /* ====== Form Styling ====== */
-  form {
-    background: #ffffff;
-    padding: 25px 30px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    max-width: 420px;
-    margin: 0 auto;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  form:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
-  }
-
-  label {
-    display: block;
-    margin-top: 15px;
-    font-weight: 600;
-    color: #0d47a1;
-  }
-
-  input, select {
-    width: 100%;
-    padding: 12px;
-    margin-top: 8px;
-    border-radius: 10px;
-    border: 1px solid #b0bec5;
-    font-size: 15px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  input:focus, select:focus {
-    border-color: #1976d2;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
-  }
-
-  button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 20px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, #1976d2, #0d47a1);
-    color: white;
-    font-weight: 600;
-    font-size: 15px;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-  }
-
-  button:hover {
-    background: linear-gradient(135deg, #0d47a1, #1565c0);
-    transform: translateY(-1px);
-  }
-
-  /* ====== Table Styling ====== */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 40px;
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-  }
-
-  th, td {
-    padding: 14px 10px;
-    border-bottom: 1px solid #e0e0e0;
-    text-align: center;
-    font-size: 15px;
-  }
-
-  th {
-    background: linear-gradient(135deg, #1976d2, #0d47a1);
-    color: #fff;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-  }
-
-  tr:hover {
-    background: #e3f2fd;
-    transition: background 0.2s ease;
-  }
-
-  /* ====== Responsive Design ====== */
-  @media (max-width: 600px) {
-    body {
-      padding: 20px;
-    }
-
-    form {
-      padding: 20px;
-    }
-
-    th, td {
-      font-size: 13px;
-      padding: 10px;
-    }
-
-    button {
-      font-size: 14px;
-    }
-  }
-</style>
-
+    /* sama seperti versi kamu tadi (dipersingkat di sini) */
+    body { font-family: "Poppins", Arial, sans-serif; background: #f6f8fa; padding: 40px; }
+    form { background: #fff; padding: 20px; border-radius: 10px; max-width: 420px; margin: 0 auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 10px; font-weight: bold; color: #0d47a1; }
+    input, select, button { width: 100%; padding: 10px; margin-top: 8px; border-radius: 8px; border: 1px solid #b0bec5; }
+    button { background: #1976d2; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    button:hover { background: #0d47a1; }
+    table { width: 100%; border-collapse: collapse; margin-top: 40px; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    th, td { padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center; }
+    th { background: #1976d2; color: white; }
+  </style>
 </head>
 <body>
-  <h1>Input Device Info</h1>
+  <h1 style="text-align:center; color:#0d47a1;">Input Device Info (via API)</h1>
 
   <form id="deviceForm">
     <label for="deviceId">Device ID</label>
@@ -160,41 +45,54 @@
   </table>
 
   <script>
-    // ===== Jawaban Anda =====
-    const devices = [];
-
-    function addDevice(deviceId, deviceName) {
-      // TODO: Lengkapi agar menyimpan data deviceId & deviceName ke array devices
-      const validNames = ["sound box pocket", "sound box premium"];
-
-      if (!validNames.includes(deviceName)) return false;
-
-      const exists = devices.some(d => d.deviceId === deviceId);
-      if (exists) return false;
-
-      devices.push({ deviceId, deviceName });
-      return true;
-    }
-
+    const API_URL = "http://localhost:3000/devices";
     const form = document.getElementById("deviceForm");
     const tableBody = document.querySelector("#deviceTable tbody");
 
-    form.addEventListener("submit", (e) => {
+    async function loadDevices() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        renderTable(data);
+      } catch (err) {
+        console.error("Gagal ambil data:", err);
+      }
+    }
+
+    async function addDevice(deviceId, deviceName) {
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ deviceId, deviceName }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          alert("❌ Gagal menambah: " + (err.error || "Unknown error"));
+          return false;
+        }
+
+        return true;
+      } catch (err) {
+        console.error("Error:", err);
+        return false;
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const deviceId = document.getElementById("deviceId").value.trim();
       const deviceName = document.getElementById("deviceName").value;
 
-      const added = addDevice(deviceId, deviceName);
-      if (!added) {
-        alert("❌ Gagal menambah device! (ID duplikat atau nama tidak valid)");
-        return;
+      const added = await addDevice(deviceId, deviceName);
+      if (added) {
+        form.reset();
+        await loadDevices();
       }
-
-      renderTable();
-      form.reset();
     });
 
-    function renderTable() {
+    function renderTable(devices) {
       tableBody.innerHTML = "";
       devices.forEach((d, i) => {
         const tr = document.createElement("tr");
@@ -206,7 +104,8 @@
         tableBody.appendChild(tr);
       });
     }
+
+    loadDevices();
   </script>
 </body>
 </html>
-
