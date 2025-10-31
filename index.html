@@ -2,26 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Input Device Info (dengan API)</title>
+  <title>Device Info App</title>
   <style>
-    /* sama seperti versi kamu tadi (dipersingkat di sini) */
-    body { font-family: "Poppins", Arial, sans-serif; background: #f6f8fa; padding: 40px; }
-    form { background: #fff; padding: 20px; border-radius: 10px; max-width: 420px; margin: 0 auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    label { display: block; margin-top: 10px; font-weight: bold; color: #0d47a1; }
+    body { font-family: "Poppins", Arial; background: #f6f8fa; padding: 40px; }
+    form, table { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    form { max-width: 420px; margin: 0 auto; padding: 20px; }
+    label { display: block; margin-top: 10px; font-weight: 600; color: #0d47a1; }
     input, select, button { width: 100%; padding: 10px; margin-top: 8px; border-radius: 8px; border: 1px solid #b0bec5; }
     button { background: #1976d2; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; }
     button:hover { background: #0d47a1; }
-    table { width: 100%; border-collapse: collapse; margin-top: 40px; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    table { width: 100%; border-collapse: collapse; margin-top: 40px; overflow: hidden; }
     th, td { padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center; }
     th { background: #1976d2; color: white; }
+    .btn-del { background: #e53935; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
+    .btn-del:hover { background: #b71c1c; }
   </style>
 </head>
 <body>
-  <h1 style="text-align:center; color:#0d47a1;">Input Device Info (via API)</h1>
+  <h1 style="text-align:center; color:#0d47a1;">Device Info (API Version)</h1>
 
   <form id="deviceForm">
     <label for="deviceId">Device ID</label>
-    <input id="deviceId" placeholder="Contoh: SBX-0001" required>
+    <input id="deviceId" placeholder="Contoh: SBX-0001" required />
 
     <label for="deviceName">Device Name</label>
     <select id="deviceName" required>
@@ -39,6 +41,7 @@
         <th>No</th>
         <th>Device ID</th>
         <th>Device Name</th>
+        <th>Aksi</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -50,47 +53,31 @@
     const tableBody = document.querySelector("#deviceTable tbody");
 
     async function loadDevices() {
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        renderTable(data);
-      } catch (err) {
-        console.error("Gagal ambil data:", err);
-      }
+      const res = await fetch(API_URL);
+      const result = await res.json();
+      renderTable(result.data || []);
     }
 
     async function addDevice(deviceId, deviceName) {
-      try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ deviceId, deviceName }),
-        });
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deviceId, deviceName }),
+      });
 
-        if (!res.ok) {
-          const err = await res.json();
-          alert("❌ Gagal menambah: " + (err.error || "Unknown error"));
-          return false;
-        }
+      const result = await res.json();
+      alert(result.message || (result.error || "Terjadi kesalahan"));
 
-        return true;
-      } catch (err) {
-        console.error("Error:", err);
-        return false;
-      }
+      if (res.ok) loadDevices();
     }
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const deviceId = document.getElementById("deviceId").value.trim();
-      const deviceName = document.getElementById("deviceName").value;
-
-      const added = await addDevice(deviceId, deviceName);
-      if (added) {
-        form.reset();
-        await loadDevices();
-      }
-    });
+    async function deleteDevice(id) {
+      if (!confirm("Hapus device ini?")) return;
+      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      const result = await res.json();
+      alert(result.message || result.error);
+      if (res.ok) loadDevices();
+    }
 
     function renderTable(devices) {
       tableBody.innerHTML = "";
@@ -100,10 +87,19 @@
           <td>${i + 1}</td>
           <td>${d.deviceId}</td>
           <td>${d.deviceName}</td>
+          <td><button class="btn-del" onclick="deleteDevice('${d.deviceId}')">Hapus</button></td>
         `;
         tableBody.appendChild(tr);
       });
     }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const deviceId = document.getElementById("deviceId").value.trim();
+      const deviceName = document.getElementById("deviceName").value;
+      await addDevice(deviceId, deviceName);
+      form.reset();
+    });
 
     loadDevices();
   </script>
