@@ -1,10 +1,28 @@
 // backend/server.js
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+/* ========================
+   🧩 KONFIGURASI STATIC FILE
+   ======================== */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// arahkan ke folder frontend (1 level di atas backend)
+app.use(express.static(path.join(__dirname, "../frontend")));
+
+/* ========================
+   🏠 ROUTE UTAMA
+   ======================== */
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+});
 
 /* ========================
    🧩 DATABASE SEDERHANA
@@ -43,7 +61,6 @@ app.get("/devices/:id", (req, res) => {
 app.post("/devices", (req, res) => {
   const { deviceId, deviceName } = req.body;
 
-  // Validasi input
   if (!deviceId || !deviceName) {
     return res.status(400).json({ success: false, error: "Data tidak lengkap" });
   }
