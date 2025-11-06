@@ -13,8 +13,6 @@ app.use(express.json());
    ======================== */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// arahkan ke folder frontend (1 level di atas backend)
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 /* ========================
@@ -25,15 +23,58 @@ app.get("/", (req, res) => {
 });
 
 /* ========================
-   🧩 DATABASE SEDERHANA
-   (disimpan di memori sementara)
+   🧩 DATABASE SEDERHANA (sementara)
    ======================== */
+let users = [];
+let sessions = {};
 let devices = [];
 
 /* ========================
-   ✅ GET /devices
-   Ambil semua data device
+   👤 AUTH: REGISTER & LOGIN
    ======================== */
+
+// REGISTER
+app.post("/register", (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password)
+    return res.status(400).json({ success: false, error: "Data tidak lengkap" });
+
+  const exist = users.find(u => u.username === username);
+  if (exist)
+    return res.status(409).json({ success: false, error: "Username sudah terdaftar" });
+
+  users.push({ username, password });
+  res.status(201).json({ success: true, message: "Registrasi berhasil!" });
+});
+
+// LOGIN
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username && u.password === password);
+
+  if (!user)
+    return res.status(401).json({ success: false, error: "Username atau password salah" });
+
+  const token = Math.random().toString(36).substring(2);
+  sessions[token] = username;
+
+  res.json({ success: true, message: "Login berhasil!", token });
+});
+
+// MIDDLEWARE CEK LOGIN
+function authMiddleware(req, res, next) {
+  const token = req.headers.authorization;
+  if (!token || !sessions[token])
+    return res.status(403).json({ success: false, error: "Akses ditolak, login dulu" });
+  next();
+}
+
+/* ========================
+   ✅ ROUTE DEVICES (dilindungi)
+   ======================== */
+app.use("/devices", authMiddleware);
+
+// GET /devices
 app.get("/devices", (req, res) => {
   res.status(200).json({
     success: true,
@@ -42,38 +83,26 @@ app.get("/devices", (req, res) => {
   });
 });
 
-/* ========================
-   ✅ GET /devices/:id
-   Ambil detail device berdasarkan deviceId
-   ======================== */
+// GET /devices/:id
 app.get("/devices/:id", (req, res) => {
   const device = devices.find(d => d.deviceId === req.params.id);
-  if (!device) {
-    return res.status(404).json({ success: false, error: "Device tidak ditemukan" });
-  }
+  if (!device) return res.status(404).json({ success: false, error: "Device tidak ditemukan" });
   res.json({ success: true, data: device });
 });
 
-/* ========================
-   ✅ POST /devices
-   Tambah device baru
-   ======================== */
+// POST /devices
 app.post("/devices", (req, res) => {
   const { deviceId, deviceName } = req.body;
-
-  if (!deviceId || !deviceName) {
+  if (!deviceId || !deviceName)
     return res.status(400).json({ success: false, error: "Data tidak lengkap" });
-  }
 
   const validNames = ["sound box pocket", "sound box premium"];
-  if (!validNames.includes(deviceName)) {
+  if (!validNames.includes(deviceName))
     return res.status(400).json({ success: false, error: "Nama device tidak valid" });
-  }
 
   const exists = devices.some(d => d.deviceId === deviceId);
-  if (exists) {
+  if (exists)
     return res.status(409).json({ success: false, error: "Device ID sudah terdaftar" });
-  }
 
   const newDevice = { deviceId, deviceName, createdAt: new Date().toISOString() };
   devices.push(newDevice);
@@ -85,15 +114,11 @@ app.post("/devices", (req, res) => {
   });
 });
 
-/* ========================
-   ✅ DELETE /devices/:id
-   Hapus device berdasarkan deviceId
-   ======================== */
+// DELETE /devices/:id
 app.delete("/devices/:id", (req, res) => {
   const index = devices.findIndex(d => d.deviceId === req.params.id);
-  if (index === -1) {
+  if (index === -1)
     return res.status(404).json({ success: false, error: "Device tidak ditemukan" });
-  }
 
   const deleted = devices.splice(index, 1)[0];
   res.json({
@@ -103,22 +128,17 @@ app.delete("/devices/:id", (req, res) => {
   });
 });
 
-/* ========================
-   ✅ PUT /devices/:id
-   Update nama device
-   ======================== */
+// PUT /devices/:id
 app.put("/devices/:id", (req, res) => {
   const { deviceName } = req.body;
   const validNames = ["sound box pocket", "sound box premium"];
 
-  if (!validNames.includes(deviceName)) {
+  if (!validNames.includes(deviceName))
     return res.status(400).json({ success: false, error: "Nama device tidak valid" });
-  }
 
   const device = devices.find(d => d.deviceId === req.params.id);
-  if (!device) {
+  if (!device)
     return res.status(404).json({ success: false, error: "Device tidak ditemukan" });
-  }
 
   device.deviceName = deviceName;
   device.updatedAt = new Date().toISOString();
