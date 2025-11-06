@@ -1,59 +1,238 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <title>Device Info App</title>
   <style>
-    body { font-family: "Poppins", Arial; background: #f6f8fa; padding: 40px; }
-    form, table { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    form { max-width: 420px; margin: 0 auto; padding: 20px; }
-    label { display: block; margin-top: 10px; font-weight: 600; color: #0d47a1; }
-    input, select, button { width: 100%; padding: 10px; margin-top: 8px; border-radius: 8px; border: 1px solid #b0bec5; }
-    button { background: #1976d2; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; }
-    button:hover { background: #0d47a1; }
-    table { width: 100%; border-collapse: collapse; margin-top: 40px; overflow: hidden; }
-    th, td { padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center; }
-    th { background: #1976d2; color: white; }
-    .btn-del { background: #e53935; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
-    .btn-del:hover { background: #b71c1c; }
+    body {
+      font-family: "Poppins", Arial, sans-serif;
+      background: #f6f8fa;
+      padding: 40px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0d47a1;
+      margin-bottom: 40px;
+    }
+
+    /* AUTH CARD */
+    #authSection {
+      max-width: 380px;
+      margin: 0 auto;
+      background: white;
+      padding: 25px 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    #authSection h2 {
+      text-align: center;
+      color: #1976d2;
+      margin-bottom: 20px;
+    }
+
+    #authSection input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cfd8dc;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    #authSection button {
+      width: 48%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #1976d2;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    #authSection button:hover {
+      background: #0d47a1;
+    }
+
+    #authSection .btn-group {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* APP SECTION */
+    #appSection {
+      max-width: 600px;
+      margin: 40px auto;
+      display: none;
+    }
+
+    form {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    form label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 600;
+      color: #0d47a1;
+    }
+
+    form input, form select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #cfd8dc;
+      border-radius: 8px;
+    }
+
+    form button {
+      width: 100%;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    form button:hover {
+      background: #0d47a1;
+    }
+
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #eceff1;
+      text-align: center;
+    }
+
+    th {
+      background: #1976d2;
+      color: white;
+      font-weight: 600;
+    }
+
+    .btn-del {
+      background: #e53935;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-del:hover {
+      background: #b71c1c;
+    }
   </style>
 </head>
 <body>
-  <h1 style="text-align:center; color:#0d47a1;">Device Info (API Version)</h1>
+  <h1>Device Info</h1>
 
-  <form id="deviceForm">
-    <label for="deviceId">Device ID</label>
-    <input id="deviceId" placeholder="Contoh: SBX-0001" required />
+  <!-- 🔐 LOGIN / REGISTER -->
+  <div id="authSection">
+    <h2>Login / Register</h2>
+    <input id="username" placeholder="Username" />
+    <input id="password" type="password" placeholder="Password" />
+    <div class="btn-group">
+      <button onclick="register()">Register</button>
+      <button onclick="login()">Login</button>
+    </div>
+  </div>
 
-    <label for="deviceName">Device Name</label>
-    <select id="deviceName" required>
-      <option value="">-- Pilih Device --</option>
-      <option value="sound box pocket">sound box pocket</option>
-      <option value="sound box premium">sound box premium</option>
-    </select>
+  <!-- 💾 APP SECTION -->
+  <div id="appSection">
+    <form id="deviceForm">
+      <label for="deviceId">Device ID</label>
+      <input id="deviceId" placeholder="Contoh: SBX-0001" required />
 
-    <button type="submit">Add Device</button>
-  </form>
+      <label for="deviceName">Device Name</label>
+      <select id="deviceName" required>
+        <option value="">-- Pilih Device --</option>
+        <option value="sound box pocket">sound box pocket</option>
+        <option value="sound box premium">sound box premium</option>
+      </select>
 
-  <table id="deviceTable">
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>Device ID</th>
-        <th>Device Name</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+      <button type="submit">Add Device</button>
+    </form>
+
+    <table id="deviceTable">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Device ID</th>
+          <th>Device Name</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
-    const API_URL = "http://localhost:3000/devices";
+    const API_BASE = "http://localhost:3000";
+    let token = null;
+
+    // =====================
+    // AUTH FUNCTIONS
+    // =====================
+    async function register() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const res = await fetch(`${API_BASE}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const result = await res.json();
+      alert(result.message || result.error);
+    }
+
+    async function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const res = await fetch(`${API_BASE}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const result = await res.json();
+      alert(result.message || result.error);
+      if (res.ok) {
+        token = result.token;
+        document.getElementById("authSection").style.display = "none";
+        document.getElementById("appSection").style.display = "block";
+        loadDevices();
+      }
+    }
+
+    // =====================
+    // DEVICE FUNCTIONS
+    // =====================
+    const API_URL = `${API_BASE}/devices`;
     const form = document.getElementById("deviceForm");
     const tableBody = document.querySelector("#deviceTable tbody");
 
     async function loadDevices() {
-      const res = await fetch(API_URL);
+      const res = await fetch(API_URL, { headers: { Authorization: token } });
       const result = await res.json();
       renderTable(result.data || []);
     }
@@ -61,19 +240,23 @@
     async function addDevice(deviceId, deviceName) {
       const res = await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
         body: JSON.stringify({ deviceId, deviceName }),
       });
-
       const result = await res.json();
-      alert(result.message || (result.error || "Terjadi kesalahan"));
-
+      alert(result.message || result.error);
       if (res.ok) loadDevices();
     }
 
     async function deleteDevice(id) {
       if (!confirm("Hapus device ini?")) return;
-      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: token },
+      });
       const result = await res.json();
       alert(result.message || result.error);
       if (res.ok) loadDevices();
@@ -100,8 +283,6 @@
       await addDevice(deviceId, deviceName);
       form.reset();
     });
-
-    loadDevices();
   </script>
 </body>
 </html>
