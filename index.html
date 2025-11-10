@@ -2,50 +2,136 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Device Info</title>
+  <title>Soundbox Devices</title>
   <style>
-    body { font-family: Poppins, sans-serif; background: #f6f8fa; padding: 40px; }
-    h1 { text-align: center; color: #0d47a1; margin-bottom: 40px; }
-    .logout { position: absolute; top: 20px; right: 20px; background: #e53935; color: #fff; padding: 8px 14px; border-radius: 6px; cursor: pointer; border: none; }
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #1565c0;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { margin: 0; font-size: 20px; }
+    header button {
+      background: #c62828;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    header button:hover { background: #b71c1c; }
+
+    main {
+      padding: 40px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 25px;
+    }
+
+    input, select, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #cfd8dc;
+      font-family: inherit;
+    }
+    button {
+      background: #1565c0;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover { background: #0d47a1; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background: #1565c0;
+      color: white;
+    }
+    td button {
+      background: #ef5350;
+      border: none;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    td button:hover { background: #c62828; }
+
+    @media(max-width: 600px) {
+      form { flex-direction: column; align-items: stretch; }
+      main { padding: 20px; }
+    }
   </style>
 </head>
 <body>
 
-  <button class="logout" onclick="logout()">Logout</button>
-  <h1>Device Info</h1>
+  <header>
+    <h1>Soundbox Device Management</h1>
+    <button onclick="logout()">Logout</button>
+  </header>
 
-  <form id="deviceForm">
-    <input id="deviceId" placeholder="Device ID" required />
-    <select id="deviceName" required>
-      <option value="">-- Pilih Device --</option>
-      <option value="sound box pocket">sound box pocket</option>
-      <option value="sound box premium">sound box premium</option>
-    </select>
-    <button type="submit">Add Device</button>
-  </form>
+  <main>
+    <form id="deviceForm">
+      <input id="deviceId" placeholder="Device ID" required />
+      <select id="deviceName" required>
+        <option value="">-- Pilih Device --</option>
+        <option value="Sound Box Pocket">Sound Box Pocket</option>
+        <option value="Sound Box Premium">Sound Box Premium</option>
+      </select>
+      <button type="submit">Tambah</button>
+    </form>
 
-  <table id="deviceTable">
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>Device ID</th>
-        <th>Device Name</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+    <table id="deviceTable">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Device ID</th>
+          <th>Device Name</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
 
 <script>
-const API_BASE = window.location.origin;
 const token = localStorage.getItem("token");
-
 if (!token) window.location.href = "login.html";
 
 const tableBody = document.querySelector("#deviceTable tbody");
 
 async function loadDevices() {
-  const res = await fetch(`${API_BASE}/devices`, {
+  const res = await fetch("/devices", {
     headers: { Authorization: token }
   });
   const result = await res.json();
@@ -57,21 +143,19 @@ function renderTable(devices) {
   devices.forEach((d, i) => {
     tableBody.innerHTML += `
       <tr>
-        <td>${i+1}</td>
+        <td>${i + 1}</td>
         <td>${d.deviceId}</td>
         <td>${d.deviceName}</td>
         <td><button onclick="deleteDevice('${d.deviceId}')">Hapus</button></td>
-      </tr>
-    `;
+      </tr>`;
   });
 }
 
-async function addDevice(evt) {
-  evt.preventDefault();
+async function addDevice(e) {
+  e.preventDefault();
   const deviceId = document.getElementById("deviceId").value.trim();
   const deviceName = document.getElementById("deviceName").value;
-
-  const res = await fetch(`${API_BASE}/devices`, {
+  const res = await fetch("/devices", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -79,15 +163,14 @@ async function addDevice(evt) {
     },
     body: JSON.stringify({ deviceId, deviceName })
   });
-
   const data = await res.json();
   alert(data.message || data.error);
   loadDevices();
 }
 
 async function deleteDevice(id) {
-  if (!confirm("Hapus device?")) return;
-  const res = await fetch(`${API_BASE}/devices/${id}`, {
+  if (!confirm("Hapus device ini?")) return;
+  const res = await fetch(`/devices/${id}`, {
     method: "DELETE",
     headers: { Authorization: token }
   });
@@ -104,6 +187,5 @@ function logout() {
 document.getElementById("deviceForm").addEventListener("submit", addDevice);
 loadDevices();
 </script>
-
 </body>
 </html>
