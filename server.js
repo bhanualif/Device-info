@@ -10,13 +10,26 @@ app.use(express.json());
 // === setup path untuk akses file html ===
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const frontendPath = path.join(__dirname, "../frontend");
-app.use(express.static(frontendPath));
+// Serve static files dari direktori yang sama dengan server.js
+app.use(express.static(__dirname));
 
 // === data sementara ===
 let users = [];
 let sessions = {};
 let devices = [];
+
+// === serve HTML files ===
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "login.html"));
+});
+
+app.get("/register", (req, res) => {
+  res.sendFile(path.join(__dirname, "register.html"));
+});
 
 // === register ===
 app.post("/register", (req, res) => {
@@ -52,29 +65,53 @@ function auth(req, res, next) {
 
 // === route devices ===
 app.get("/devices", auth, (req, res) => {
-  res.json({ data: devices });
+  res.json({
+    success: true,
+    data: devices
+  });
 });
 
 app.post("/devices", auth, (req, res) => {
   const { deviceId, deviceName } = req.body;
   if (!deviceId || !deviceName)
-    return res.status(400).json({ error: "Lengkapi data!" });
+    return res.status(400).json({ success: false, error: "Lengkapi data!" });
 
   if (devices.find(d => d.deviceId === deviceId))
-    return res.status(409).json({ error: "Device sudah ada!" });
+    return res.status(409).json({ success: false, error: "Device sudah ada!" });
 
   devices.push({ deviceId, deviceName });
-  res.json({ message: "Device berhasil ditambah!" });
+  res.json({ success: true, message: "Device berhasil ditambah!" });
 });
 
 app.delete("/devices/:id", auth, (req, res) => {
   const index = devices.findIndex(d => d.deviceId === req.params.id);
   if (index === -1)
-    return res.status(404).json({ error: "Device tidak ditemukan!" });
+    return res.status(404).json({ success: false, error: "Device tidak ditemukan!" });
 
   devices.splice(index, 1);
-  res.json({ message: "Device berhasil dihapus!" });
+  res.json({ success: true, message: "Device berhasil dihapus!" });
 });
 
-// INI PENTING: jangan app.listen(), tapi export default
+// INI PENTING: export default untuk Vercel/deployment
 export default app;
+
+// Jalankan server secara lokal (hanya jika tidak di Vercel)
+if (process.env.VERCEL !== "1") {
+  const PORT = process.env.PORT || 3000;
+  const server = app.listen(PORT, () => {
+    console.log(`Server API berjalan di http://localhost:${PORT}`);
+    console.log(`Buka browser: http://localhost:${PORT}`);
+    console.log(`Tekan Ctrl+C untuk menghentikan server`);
+  });
+
+  // Handle error
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} sudah digunakan. Coba gunakan port lain.`);
+      console.log(`Contoh: PORT=3001 node server.js`);
+    } else {
+      console.error('Error:', err);
+    }
+    process.exit(1);
+  });
+}
