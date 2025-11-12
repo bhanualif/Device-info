@@ -131,7 +131,7 @@ if (!token) window.location.href = "login.html";
 const tableBody = document.querySelector("#deviceTable tbody");
 
 async function loadDevices() {
-  const res = await fetch("/devices", {
+  const res = await fetch("/api/devices", {
     headers: { Authorization: token }
   });
   const result = await res.json();
@@ -155,7 +155,7 @@ async function addDevice(e) {
   e.preventDefault();
   const deviceId = document.getElementById("deviceId").value.trim();
   const deviceName = document.getElementById("deviceName").value;
-  const res = await fetch("/devices", {
+  const res = await fetch("/api/devices", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -170,7 +170,7 @@ async function addDevice(e) {
 
 async function deleteDevice(id) {
   if (!confirm("Hapus device ini?")) return;
-  const res = await fetch(`/devices/${id}`, {
+  const res = await fetch(`/api/devices/${id}`, {
     method: "DELETE",
     headers: { Authorization: token }
   });
