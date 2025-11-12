@@ -1,0 +1,18 @@
+{
+  "users": [
+    {
+      "username": "bhanu",
+      "password": "123"
+    },
+    {
+      "username": "alif",
+      "password": "123"
+    }
+  ],
+  "devices": [
+    {
+      "deviceId": "SBX-0001",
+      "deviceName": "Sound Box Premium"
+    }
+  ]
+}
