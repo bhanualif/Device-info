@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "buildCommand": "cd backend && npm install",
+  "devCommand": "cd backend && npm start",
+  "functions": {
+    "api/index.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/register",
+      "dest": "/frontend/register.html"
+    },
+    {
+      "src": "/login",
+      "dest": "/frontend/login.html"
+    },
+    {
+      "src": "/index",
+      "dest": "/frontend/index.html"
+    },
+    {
+      "src": "/",
+      "dest": "/frontend/login.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ]
+}
